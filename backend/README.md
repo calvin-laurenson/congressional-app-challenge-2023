@@ -1,1 +1,1 @@
-Python Backend. FastAPI + SQLAlchemy?
+Python Backend. FastAPI + SQLAlchemy + PostgreSQL
