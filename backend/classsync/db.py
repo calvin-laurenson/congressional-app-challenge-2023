@@ -36,10 +36,44 @@ class Teacher(Base):
 
     name = Column(String)
     class_id = Column(String)
+    username = Column(String)
+    password = Column(String)
 
-    def __init__(self, name, class_id):
+    def __init__(self, name, class_id, username, password):
         self.name = name
         self.class_id = class_id
+        self.username = username
+        self.password = password
+
+class Schedule(Base):
+    __tablename__ = 'schedules'
+
+    id = Column(Integer, primary_key=True)
+
+    school_name = Column(String)
+    schedule_id = Column(Integer)
+    periods = Column(Integer)
+
+    def __init__(self, school_name, schedule_id, periods):
+        self.school_name = school_name
+        self.schedule_id = schedule_id
+        self.periods = periods
+
+class Class(Base):
+    __tablename__ = 'classes'
+
+    id = Column(Integer, primary_key=True)
+
+    class_id = Column(Integer)
+    schedule_id = Column(Integer)
+    duration = Column(Integer)
+    periods = Column(String)
+
+    def __init__(self, class_id, schedule_id, duration, periods):
+        self.class_id = class_id
+        self.schedule_id = schedule_id
+        self.duration = duration
+        self.periods = periods
 
 ### Next classes are user-configured timers
 
