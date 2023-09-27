@@ -6,6 +6,7 @@ import uvicorn
 
 app = FastAPI()
 
+
 @app.post("/add_student")
 async def add_student(name: str, class_id: int, attendance: bool = False):
     with Session(engine) as session:

@@ -5,7 +5,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 engine = create_engine('sqlite:///data.db', echo=True)
 Base = declarative_base()
 
-# Student Class using takes name & attendance parameters
+# Student Class takes name, attendance, & class_id parameters
 
 class Student(Base):
     __tablename__ = "students"
@@ -20,6 +20,8 @@ class Student(Base):
         self.name = name
         self.attendance = attendance
         self.class_id = class_id
+
+# Teacher Class takes name & class_id parameters
 
 class Teacher(Base):
     __tablename__ = "teachers"
