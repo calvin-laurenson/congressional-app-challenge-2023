@@ -6,11 +6,10 @@ import uvicorn
 
 app = FastAPI()
 
-
 @app.post("/add_student")
-async def add_student(name: str, class_id: int, attendance: bool = False):
+async def add_student(name: str, face_id: int, class_id: float, date:str, attendance: bool = False):
     with Session(engine) as session:
-        student = Student(name=name, attendance=attendance, class_id = class_id)
+        student = Student(name = name, attendance = attendance, face_id = face_id, class_id = class_id, date = date)
         session.add(student)
         session.commit()
         return {"Student added": student.name}
@@ -18,7 +17,7 @@ async def add_student(name: str, class_id: int, attendance: bool = False):
 @app.post("/add_teacher")
 async def add_teacher(name: str, class_id: int):
     with Session(engine) as session:
-        teacher = Teacher(name=name, class_id=class_id)
+        teacher = Teacher(name = name, class_id = class_id)
         session.add(teacher)
         session.commit()
         return {"Teacher added": teacher.name}
