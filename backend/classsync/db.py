@@ -5,7 +5,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 engine = create_engine('sqlite:///app_data.db', echo=True)
 Base = declarative_base()
 
-### Next classes involve user classes
+### Next classes are user info in the database
 
 # Student Class takes name, attendance, & class_id parameters
 
@@ -39,6 +39,24 @@ class Teacher(Base):
 
     def __init__(self, name, class_id):
         self.name = name
-        self.classid = class_id
+        self.class_id = class_id
+
+### Next classes are user-configured timers
+
+# Timer class takes name, timing, and alarm sound id
+
+class Timer(Base):
+    __tablename__ = "timers"
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+    timing = Column(Integer)
+    alarm_sound_id = Column(String)
+
+    def __init__(self, name, timing, alarm_sound_id):
+        self.name = name
+        self.timing = timing
+        self.alarm_sound_id = alarm_sound_id
 
 Base.metadata.create_all(engine)
