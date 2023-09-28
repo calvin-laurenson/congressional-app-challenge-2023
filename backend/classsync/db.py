@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy import Column, Date, Integer, String, Float, Boolean
+from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy.orm import declarative_base, mapped_column
 from pgvector.sqlalchemy import Vector
 engine = create_engine('sqlite:///app_data.db', echo=True)
