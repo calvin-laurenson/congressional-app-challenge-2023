@@ -1,11 +1,45 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
+from classsync.db import Student, Timer, engine
+from sqlalchemy.orm import Session
 import uvicorn
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+# Post section for students, teachers, timers
+
+@app.post("/add_student")
+async def add_student(name, face_embedding):
+    with Session(engine) as session:
+        student = Student(name, face_embedding)
+        session.add(student)
+        session.commit()
+        return {"Student succesfully added" : student.name}
+
+@app.post("/add_timer")
+async def add_timer(timing, alarm_sound_id):
+    with Session(engine) as session:
+        timer = Timer(timing, alarm_sound_id)
+        session.add(timer)
+        session.commit()
+        return {"Timer succesfully added" : timer.name}
+    
+# Get section for students, teachers, timers
+
+@app.get("/get_student")
+async def get_student():
+    with Session(engine) as session:
+        student_query = session.query(Student)
+        return student_query.all()
+    
+@app.get("/get_timer")
+async def get_timer():
+    with Session(engine) as session:
+        timer_query = session.query(Timer)
+        return timer_query.all()
+
+# Update section for timers & students
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000)
+
