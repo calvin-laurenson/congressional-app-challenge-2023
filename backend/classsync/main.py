@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete
@@ -52,6 +53,7 @@ async def get_timer():
         timer_query = session.query(Timer)
         return timer_query.all()
 
+
 @app.get("/get_writings")
 async def get_writings():
     with Session(engine) as session:
@@ -69,7 +71,7 @@ async def get_plagiarized():
 
         return int(round(cosine_similarity(model.encode(writing[0]), model.encode(writing[1])), 2)*100)
 
-#
+# Uses PATCH to remove writings in database
 
 @app.patch("/remove_writings")
 def remove_writings():

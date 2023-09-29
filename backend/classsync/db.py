@@ -32,6 +32,7 @@ class Timer(Base):
     def __init__(self, timing, alarm_sound_id):
         self.timing = timing
         self.alarm_sound_id = alarm_sound_id
+
 class Writing(Base):
     __tablename__ = "writings"
 
