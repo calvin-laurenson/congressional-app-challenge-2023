@@ -32,14 +32,5 @@ class Timer(Base):
     def __init__(self, timing, alarm_sound_id):
         self.timing = timing
         self.alarm_sound_id = alarm_sound_id
-class Writing(Base):
-    __tablename__ = "writings"
-
-    id = Column(Integer, primary_key=True)
-
-    writing = Column(String)
-
-    def __init__(self, writing):
-        self.writing = writing
 
 Base.metadata.create_all(engine)
