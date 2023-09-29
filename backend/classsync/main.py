@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete
@@ -26,13 +27,11 @@ async def add_timer(timing, alarm_sound_id):
         session.commit()
         return {"Timer succesfully added": timer.name}
 
- # Get section for students, teachers, timers 
+# Get section for students, plagiarism, timers
 
 @app.get("/get_plagiarized")
 async def get_plagiarized(writing1, writing2):
     return int(round(cosine_similarity(model.encode(writing1), model.encode(writing2)), 2)*100)
-    
-# Get section for students, plagiarism, timers
 
 @app.get("/get_students")
 async def get_student():
@@ -45,12 +44,6 @@ async def get_timer():
     with Session(engine) as session:
         timer_query = session.query(Timer)
         return timer_query.all()
-
-@app.get("/get_writings")
-async def get_writings():
-    with Session(engine) as session:
-        writing_query = session.query(Writing)
-        return writing_query.all()
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000)
