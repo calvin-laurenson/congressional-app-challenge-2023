@@ -26,12 +26,11 @@ async def add_timer(timing, alarm_sound_id):
         session.add(timer)
         session.commit()
         return {"Timer succesfully added": timer.name}
-
 # Get section for students, plagiarism, timers
 
 @app.get("/get_plagiarized")
-async def get_plagiarized(writing1, writing2):
-    return int(round(cosine_similarity(model.encode(writing1), model.encode(writing2)), 2)*100)
+async def get_plagiarized(writing1 : str, writing2 : str):
+    return float(cosine_similarity(model.encode(writing1), model.encode(writing2)))
 
 @app.get("/get_students")
 async def get_student():
@@ -47,4 +46,3 @@ async def get_timer():
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000)
-
