@@ -6,8 +6,6 @@ from classsync.ml.image_utils import Box, DetectedFace, KeyPoint, draw_bboxes
 from numpy.typing import NDArray
 from PIL import Image
 
-import numpy as np
-
 def softmax(z: NDArray) -> NDArray:
     """
     Calculate the softmax function for a 2D array of input values.
