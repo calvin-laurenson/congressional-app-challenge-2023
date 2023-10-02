@@ -87,9 +87,7 @@ def extract_face_images(
 
     return face_images
 
-import numpy as np
-
-def nms(faces, thresh=0.3):
+def nms(faces: list[DetectedFace], thresh=0.3):
     """
     Perform Non-Maximum Suppression (NMS) on a list of detected faces.
 
