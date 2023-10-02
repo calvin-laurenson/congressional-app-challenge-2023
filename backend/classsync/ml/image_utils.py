@@ -87,32 +87,62 @@ def extract_face_images(
 
     return face_images
 
+import numpy as np
 
-def nms(faces: list[DetectedFace], thresh=0.3) -> list[DetectedFace]:
+def nms(faces, thresh=0.3):
+    """
+    Perform Non-Maximum Suppression (NMS) on a list of detected faces.
+
+    Parameters:
+    faces (list[DetectedFace]): A list of DetectedFace objects containing bounding box information.
+    thresh (float, optional): The threshold value for IoU (Intersection over Union) to retain faces.
+                              Defaults to 0.3.
+
+    Returns:
+    list[DetectedFace]: A list of DetectedFace objects after NMS has been applied.
+    """
+    # Extract the coordinates (x1, y1, x2, y2) and scores of each detected face
     x1 = np.array([f.bbox.x1 for f in faces])
     y1 = np.array([f.bbox.y1 for f in faces])
     x2 = np.array([f.bbox.x2 for f in faces])
     y2 = np.array([f.bbox.y2 for f in faces])
     scores = np.array([f.bbox.score for f in faces])
 
+    # Calculate the areas of the bounding boxes
     areas = (x2 - x1 + 1) * (y2 - y1 + 1)
+    
+    # Sort the faces in descending order of their scores and get the corresponding indices
     order = scores.argsort()[::-1]
 
+    # Initialize a list 'keep' to store the indices of the faces to be retained after NMS
     keep = []
+    
+    # Perform non-maximum suppression
     while order.size > 0:
-        i = order[0]
-        keep.append(i)
+        i = order[0]  # Select the face with the highest score
+        keep.append(i)  # Add its index to the 'keep' list
+        
+        # Calculate the intersection coordinates and dimensions of the selected face and other faces
         xx1 = np.maximum(x1[i], x1[order[1:]])
         yy1 = np.maximum(y1[i], y1[order[1:]])
         xx2 = np.minimum(x2[i], x2[order[1:]])
         yy2 = np.minimum(y2[i], y2[order[1:]])
 
+        # Calculate the width and height of the intersection area (clipped to zero if no overlap)
         w = np.maximum(0.0, xx2 - xx1 + 1)
         h = np.maximum(0.0, yy2 - yy1 + 1)
+        
+        # Calculate the intersection area
         inter = w * h
+        
+        # Calculate the overlap ratio (IoU) between the selected face and other faces
         ovr = inter / (areas[i] + areas[order[1:]] - inter)
 
+        # Find the indices of faces with IoU less than or equal to the threshold
         inds = np.where(ovr <= thresh)[0]
+        
+        # Update the 'order' array to exclude faces that are too similar to the selected face
         order = order[inds + 1]
 
+    # Return the list of faces that survived non-maximum suppression
     return [face for i, face in enumerate(faces) if i in keep]
