@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy.orm import declarative_base, mapped_column
 from pgvector.sqlalchemy import Vector
-engine = create_engine('sqlite:///app_data.db', echo=True)
+engine = create_engine('sqlite:///student_data.db', echo=True)
 Base = declarative_base()
 
 ### Next classes are user info in the database
@@ -25,6 +25,7 @@ class Timer(Base):
     __tablename__ = "timers"
 
     id = Column(Integer, primary_key=True)
+
     timing = Column(Integer)
     alarm_sound_id = Column(String)
 
