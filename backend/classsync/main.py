@@ -20,12 +20,18 @@ async def add_student(name, face_embedding):
         return {"Student succesfully added": student.name}
 
 @app.post("/add_timer")
-async def add_timer(timing, alarm_sound_id):
+async def add_timer(timing):
     with Session(engine) as session:
-        timer = Timer(timing, alarm_sound_id)
+        timer = Timer(timing)
         session.add(timer)
         session.commit()
         return {"Timer succesfully added": timer.name}
+    
+# Post for image transfer from camera
+@app.post("/add_image")
+async def add_image(image, time):
+    student = ()
+
 # Get section for students, plagiarism, timers
 
 @app.get("/get_plagiarized")
