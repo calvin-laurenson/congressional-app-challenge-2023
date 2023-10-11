@@ -18,7 +18,6 @@ pgvector = "^0.2.3"
 sentence-transformers = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.5.1"
 black = "^23.9.1"
 
 [tool.poetry.group.types.dependencies]
@@ -27,11 +26,3 @@ types-Pillow = "10.0.0.3"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.mypy]
-python_version = "3.11"
-mypy_path = "classync"
-
-[[tool.mypy.overrides]]
-module = "onnxruntime.*,sentence_transformers.*,pgvector.*"
-ignore_missing_imports = true
