@@ -121,7 +121,7 @@ def distance2kps(points, distance, max_shape=None):
 class SCRFD:
     def __init__(self, model_file: str | None = None, session: str | None = None, nms_thresh: float = 0.4):
         self.model_file = model_file
-        self.center_cache = {}
+        self.center_cache: dict[tuple[int, int, int], NDArray] = {}
         self.nms_thresh = nms_thresh
         if session is None:
             assert self.model_file is not None
