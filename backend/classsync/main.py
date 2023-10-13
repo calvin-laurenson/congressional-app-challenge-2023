@@ -20,6 +20,17 @@ async def add_teacher(name):
         session.commit()
         return {"Teacher succesfully added": teacher.name}
 
+@app.post("/add_class")
+async def add_periodclass(name, teacher_name, students=None):
+    with Session(engine) as session:
+        teacher = session.query(Teacher).filter(Teacher.name == teacher_name).all()
+        if len(teacher) != 1:
+            return {"error": f"teacher not found for periodclass {teacher}"}
+        periodclass = PeriodClass(name=name, teacher=teacher[0], students=students)
+        session.add(periodclass)
+        session.commit()
+        return {"succesfully added": periodclass.name}
+
 @app.post("/add_student")
 async def add_student(name, face_embedding):
     with Session(engine) as session:
@@ -58,6 +69,12 @@ async def get_attendance():
 @app.get("/get_plagiarized")
 async def get_plagiarized(writing1 : str, writing2 : str):
     return float(cosine_similarity(model.encode(writing1), model.encode(writing2)))
+
+@app.get("/get_classes")
+async def get_periodclasses():
+    with Session(engine) as session:
+        periodclass_query = session.query(PeriodClass)
+        return periodclass_query.all()
 
 @app.get("/get_students")
 async def get_student():

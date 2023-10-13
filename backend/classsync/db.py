@@ -5,13 +5,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from pgvector.sqlalchemy import Vector
 
-print("Started")
 engine = create_engine('postgresql+psycopg2://postgres:esheldror1234@209.141.60.99:1678/eshel', echo=True)
-print("Done")
-print(engine)
 with Session(engine) as session:
     session.execute(text('CREATE EXTENSION IF NOT EXISTS vector'))
-print("Extension now present")
 Base = declarative_base()
 
 
@@ -28,7 +24,8 @@ class Teacher(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     name: Mapped[str] = mapped_column()
-    periodclasses: Mapped[Optional[List["PeriodClass"]]] = relationship()
+    periodclasses: Mapped[Optional[List["PeriodClass"]]] = relationship(back_populates="teacher")
+    periodclasses: Mapped[Optional[List[int]]] = mapped_column(foreign_keys="periodclasses.id")
     timers: Mapped[Optional[List["Timer"]]] = relationship()
 
 class PeriodClass(Base):
@@ -38,7 +35,8 @@ class PeriodClass(Base):
     
     name: Mapped[str] = mapped_column()
     teacher_id: Mapped[int] = mapped_column(ForeignKey("teachers.id"))
-    students: Mapped[List["Student"]] = relationship(secondary=association_table, back_populates="periodclasses")
+    teacher: Mapped["Teacher"] = relationship(back_populates="periodclasses")
+    students: Mapped[Optional[List["Student"]]] = relationship(secondary=association_table, back_populates="periodclasses")
 
 class Student(Base):
     __tablename__ = "students"
