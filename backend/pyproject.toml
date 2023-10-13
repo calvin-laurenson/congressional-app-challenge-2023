@@ -18,6 +18,11 @@ pgvector = "^0.2.3"
 sentence-transformers = "^2.2.2"
 psycopg2 = "^2.9.9"
 
+[tool.poetry.group.dev.dependencies]
+black = "^23.9.1"
+
+[tool.poetry.group.types.dependencies]
+types-Pillow = "10.0.0.3"
 
 [build-system]
 requires = ["poetry-core"]

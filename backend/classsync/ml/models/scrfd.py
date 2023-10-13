@@ -6,6 +6,7 @@ from classsync.ml.image_utils import Box, DetectedFace, KeyPoint, draw_bboxes
 from numpy.typing import NDArray
 from PIL import Image
 
+
 def softmax(z: NDArray) -> NDArray:
     """
     Calculate the softmax function for a 2D array of input values.
@@ -53,7 +54,6 @@ def softmax(z: NDArray) -> NDArray:
     div = np.sum(e_x, axis=1)  # Calculate the sum of exponentials for each row.
     div = div[:, np.newaxis]  # Add a new axis to 'div' for broadcasting.
     return e_x / div  # Return the softmax probabilities.
-
 
 
 def distance2bbox(points, distance, max_shape=None):
@@ -119,14 +119,21 @@ def distance2kps(points, distance, max_shape=None):
 
 
 class SCRFD:
-    def __init__(self, model_file: str | None = None, session: str | None = None, nms_thresh: float = 0.4):
+    def __init__(
+        self,
+        model_file: str | None = None,
+        session: str | None = None,
+        nms_thresh: float = 0.4,
+    ):
         self.model_file = model_file
-        self.center_cache = {}
+        self.center_cache: dict[tuple[int, int, int], NDArray] = {}
         self.nms_thresh = nms_thresh
         if session is None:
             assert self.model_file is not None
             assert osp.exists(self.model_file)
-            self.session = onnxruntime.InferenceSession(self.model_file, None, providers=["CPUExecutionProvider"])
+            self.session = onnxruntime.InferenceSession(
+                self.model_file, None, providers=["CPUExecutionProvider"]
+            )
         else:
             self.session = session
         input_cfg = self.session.get_inputs()[0]
@@ -159,14 +166,13 @@ class SCRFD:
             self._feat_stride_fpn = [8, 16, 32, 64, 128]
             self._num_anchors = 1
             self.use_kps = True
-        
 
     def forward(self, img: NDArray, thresh):
         scores_list = []
         bboxes_list = []
         kpss_list = []
         input_size = tuple(img.shape[0:2][::-1])
-        
+
         img = img.astype(np.float32)
         img = ((img / 255.0) - 0.5) / 0.5
         img = img.transpose((2, 0, 1))
@@ -295,7 +301,6 @@ class SCRFD:
             )
         return faces
 
-
     def nms(self, dets):
         thresh = self.nms_thresh
         x1 = dets[:, 0]
@@ -339,4 +344,3 @@ if __name__ == "__main__":
     draw_bboxes(img, faces)
     filename = img_path.split("/")[-1]
     img.save("./done-%s" % filename)
-

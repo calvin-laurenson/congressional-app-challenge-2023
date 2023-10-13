@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete, select
@@ -31,6 +30,7 @@ async def add_periodclass(name, teacher_name, students=None):
         session.commit()
         return {"succesfully added": periodclass.name}
 
+
 @app.post("/add_student")
 async def add_student(name, face_embedding):
     with Session(engine) as session:
@@ -39,6 +39,7 @@ async def add_student(name, face_embedding):
         session.commit()
         return {"Student succesfully added": student.name}
 
+
 @app.post("/add_timer")
 async def add_timer(timing, teacher_id):
     with Session(engine) as session:
@@ -46,7 +47,7 @@ async def add_timer(timing, teacher_id):
         session.add(timer)
         session.commit()
         return {"Timer succesfully added": timer.name}
-    
+
 # Post for image transfer from camera
 @app.post("/add_image")
 async def add_image(image, time):
@@ -64,10 +65,12 @@ async def get_attendance():
     with Session(engine) as session:
         attendance_query = session.query(AttendanceEvent)
         return attendance_query.all()
+
 # Get section for students, plagiarism, timers
 
+
 @app.get("/get_plagiarized")
-async def get_plagiarized(writing1 : str, writing2 : str):
+async def get_plagiarized(writing1: str, writing2: str):
     return float(cosine_similarity(model.encode(writing1), model.encode(writing2)))
 
 @app.get("/get_classes")
@@ -81,7 +84,8 @@ async def get_student():
     with Session(engine) as session:
         student_query = session.query(Student)
         return student_query.all()
-    
+
+
 @app.get("/get_timers")
 async def get_timer():
     with Session(engine) as session:

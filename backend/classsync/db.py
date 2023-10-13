@@ -38,6 +38,7 @@ class PeriodClass(Base):
     teacher: Mapped["Teacher"] = relationship(back_populates="periodclasses")
     students: Mapped[Optional[List["Student"]]] = relationship(secondary=association_table, back_populates="periodclasses")
 
+
 class Student(Base):
     __tablename__ = "students"
 
@@ -56,6 +57,7 @@ class AttendanceEvent(Base):
     time: Mapped[str] = mapped_column() # TODO: Make datetime
     inputType: Mapped[str] = mapped_column()
 
+
 class Timer(Base):
     __tablename__ = "timers"
 
@@ -63,5 +65,6 @@ class Timer(Base):
 
     timing: Mapped[int] = mapped_column()
     teacher_id: Mapped[int] = mapped_column(ForeignKey("teachers.id"))
+
 
 Base.metadata.create_all(engine)

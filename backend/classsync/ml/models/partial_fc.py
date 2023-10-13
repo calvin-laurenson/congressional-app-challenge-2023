@@ -18,7 +18,9 @@ class PartialFC:
         if self.session is None:
             assert model_file is not None
             assert osp.exists(model_file)
-            self.session = ort.InferenceSession(model_file, providers=["CPUExecutionProvider"])
+            self.session = ort.InferenceSession(
+                model_file, providers=["CPUExecutionProvider"]
+            )
         self.input_name = self.session.get_inputs()[0].name
         self.output_name = self.session.get_outputs()[0].name
 
@@ -38,7 +40,7 @@ class PartialFC:
         # RGB -> BGR
         img_array = img_array[:, :, ::-1]
         return self.forward(img_array)
-        
+
 
 if __name__ == "__main__":
     pfc = PartialFC("pfc.onnx")
