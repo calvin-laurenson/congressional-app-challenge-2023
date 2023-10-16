@@ -1,33 +1,70 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import delete
-from classsync.db import Student, Timer, engine
+from sqlalchemy import delete, select
+from classsync.db import Student, Timer, engine, AttendanceEvent, Teacher, PeriodClass
 from classsync.plagiarism_detector import model, cosine_similarity
+from classsync.models import Models
 from sqlalchemy.orm import Session
 import uvicorn
 
 app = FastAPI()
+model = Models()
 
 # Post section for students, teachers, timers
+@app.post("/add_teacher")
+async def add_teacher(name):
+    with Session(engine) as session:
+        teacher = Teacher(name=name)
+        session.add(teacher)
+        session.commit()
+        return {"Teacher succesfully added": teacher.name}
+
+@app.post("/add_class")
+async def add_periodclass(name, teacher_name, students=None):
+    with Session(engine) as session:
+        teacher = session.query(Teacher).filter(Teacher.name == teacher_name).all()
+        if len(teacher) != 1:
+            return {"error": f"teacher not found for periodclass {teacher}"}
+        periodclass = PeriodClass(name=name, teacher=teacher[0], students=students)
+        session.add(periodclass)
+        session.commit()
+        return {"succesfully added": periodclass.name}
 
 
 @app.post("/add_student")
 async def add_student(name, face_embedding):
     with Session(engine) as session:
-        student = Student(name, face_embedding)
+        student = Student(name=name, face_embedding=face_embedding)
         session.add(student)
         session.commit()
         return {"Student succesfully added": student.name}
 
 
 @app.post("/add_timer")
-async def add_timer(timing, alarm_sound_id):
+async def add_timer(timing, teacher_id):
     with Session(engine) as session:
-        timer = Timer(timing, alarm_sound_id)
+        timer = Timer(timing=timing, teacher_id=teacher_id)
         session.add(timer)
         session.commit()
         return {"Timer succesfully added": timer.name}
 
+# Post for image transfer from camera
+@app.post("/add_image")
+async def add_image(image, time):
+    faces = model.findFaces(image)
+    with Session(engine) as session:
+        for face in faces:
+            student = session.scalars(select(Student).order_by(Student.face_embedding.cosine_distance(face)).limit(5))
+            entry = AttendanceEvent(student=student, time=time, inputType="image")
+            session.add(entry)
+        session.commit()
+        return {"Recognized faces": len(faces)}
+    
+@app.get("/get_attendance")
+async def get_attendance():
+    with Session(engine) as session:
+        attendance_query = session.query(AttendanceEvent)
+        return attendance_query.all()
 
 # Get section for students, plagiarism, timers
 
@@ -36,6 +73,11 @@ async def add_timer(timing, alarm_sound_id):
 async def get_plagiarized(writing1: str, writing2: str):
     return float(cosine_similarity(model.encode(writing1), model.encode(writing2)))
 
+@app.get("/get_classes")
+async def get_periodclasses():
+    with Session(engine) as session:
+        periodclass_query = session.query(PeriodClass)
+        return periodclass_query.all()
 
 @app.get("/get_students")
 async def get_student():
@@ -50,6 +92,11 @@ async def get_timer():
         timer_query = session.query(Timer)
         return timer_query.all()
 
+@app.get("/get_teachers")
+async def get_teachers():
+    with Session(engine) as session:
+        teacher_query = session.query(Teacher)
+        return teacher_query.all()
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000)
