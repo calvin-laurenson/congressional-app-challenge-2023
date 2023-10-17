@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete, select
-from classsync.db import Student, Timer, engine, AttendanceEvent, Teacher, PeriodClass
+from classsync.db import Student, Timer, engine, AttendanceEvent, Teacher, PeriodClass, association_table
 from classsync.plagiarism_detector import model, cosine_similarity
 from classsync.models import Models
 from sqlalchemy.orm import Session
@@ -25,16 +25,19 @@ async def add_periodclass(name, teacher_name, students=None):
         teacher = session.query(Teacher).filter(Teacher.name == teacher_name).all()
         if len(teacher) != 1:
             return {"error": f"teacher not found for periodclass {teacher}"}
-        periodclass = PeriodClass(name=name, teacher=teacher[0], students=students)
+        if students is None:
+            periodclass = PeriodClass(name=name, teacher=teacher[0])
+        else:
+            periodclass = PeriodClass(name=name, teacher=teacher[0], students=students)
         session.add(periodclass)
         session.commit()
         return {"succesfully added": periodclass.name}
 
 
 @app.post("/add_student")
-async def add_student(name, face_embedding):
+async def add_student(name):
     with Session(engine) as session:
-        student = Student(name=name, face_embedding=face_embedding)
+        student = Student(name=name)
         session.add(student)
         session.commit()
         return {"Student succesfully added": student.name}
@@ -66,8 +69,18 @@ async def get_attendance():
         attendance_query = session.query(AttendanceEvent)
         return attendance_query.all()
 
-# Get section for students, plagiarism, timers
+@app.patch("/add_student_to_class")
+async def add_student_to_class(student_id: int, class_id: int):
+    with Session(engine) as session:
+        student_query = session.query(Student).filter(Student.id == student_id)
+        if len(student_query.all()) != 1:
+            return {"error": f"student not found for {student_id=}"}
+        
+        session.execute(association_table.insert().values(student_id=student_id, periodclass_id=class_id))
+        session.commit()
+        return {"error": None}
 
+# Get section for students, plagiarism, timers
 
 @app.get("/get_plagiarized")
 async def get_plagiarized(writing1: str, writing2: str):
@@ -97,6 +110,14 @@ async def get_teachers():
     with Session(engine) as session:
         teacher_query = session.query(Teacher)
         return teacher_query.all()
+
+@app.get("/get_students_in_class")
+async def get_students_in_class(class_id: int):
+    with Session(engine) as session:
+        periodclass_query = session.query(PeriodClass).filter(PeriodClass.id == class_id)
+        if len(periodclass_query.all()) != 1:
+            return {"error": f"periodclass not found for {class_id=}"}
+        return periodclass_query[0].students
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000)

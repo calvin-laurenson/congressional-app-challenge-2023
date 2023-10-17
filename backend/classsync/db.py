@@ -1,7 +1,8 @@
 from typing import List, Optional
-from sqlalchemy import create_engine, ForeignKey, Table, Column
+from sqlalchemy import create_engine, ForeignKey, Table, Column, Integer
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.sql import text
 from pgvector.sqlalchemy import Vector
 
@@ -25,7 +26,7 @@ class Teacher(Base):
 
     name: Mapped[str] = mapped_column()
     periodclasses: Mapped[Optional[List["PeriodClass"]]] = relationship(back_populates="teacher")
-    periodclasses: Mapped[Optional[List[int]]] = mapped_column(foreign_keys="periodclasses.id")
+    periodclasses_ids: Mapped[Optional[list[int]]] = mapped_column(ARRAY(Integer), foreign_keys="periodclasses.id")
     timers: Mapped[Optional[List["Timer"]]] = relationship()
 
 class PeriodClass(Base):
@@ -38,7 +39,6 @@ class PeriodClass(Base):
     teacher: Mapped["Teacher"] = relationship(back_populates="periodclasses")
     students: Mapped[Optional[List["Student"]]] = relationship(secondary=association_table, back_populates="periodclasses")
 
-
 class Student(Base):
     __tablename__ = "students"
 
@@ -46,7 +46,7 @@ class Student(Base):
 
     periodclasses: Mapped[List["PeriodClass"]] = relationship(secondary=association_table, back_populates="students")
     name: Mapped[str] = mapped_column()
-    face_embedding = mapped_column(Vector(384))
+    face_embedding = mapped_column(Vector(384), nullable=True)
 
 class AttendanceEvent(Base):
     __tablename__ = "attendance_events"
