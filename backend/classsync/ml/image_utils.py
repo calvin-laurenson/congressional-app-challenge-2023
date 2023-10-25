@@ -55,14 +55,14 @@ def draw_bboxes(img, faces, draw_size=1):
 
 def extract_face_images(
     img: Image.Image, faces: list[DetectedFace], align=True
-) -> list[NDArray]:
+) -> list[Image.Image]:
     face_images = []
 
     for face in faces:
         if face.kps is None or not align:
             face_bbox = (face.bbox.x1, face.bbox.y1, face.bbox.x2, face.bbox.y2)
             face_img = img.crop(face_bbox)
-            face_images.append(np.array(face_img))
+            face_images.append(face_img)
         else:
             left_eye = face.kps[1]
             right_eye = face.kps[0]
@@ -83,7 +83,7 @@ def extract_face_images(
             face_bbox = (face.bbox.x1, face.bbox.y1, face.bbox.x2, face.bbox.y2)
             face_img = rotated_img.crop(face_bbox)
 
-            face_images.append(np.array(face_img))
+            face_images.append(face_img)
 
     return face_images
 
