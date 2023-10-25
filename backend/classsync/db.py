@@ -6,13 +6,16 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.sql import text
 from pgvector.sqlalchemy import Vector
 
+print("Initiating DB Engine")
 engine = create_engine(
     "postgresql+psycopg2://postgres:esheldror1234@209.141.60.99:1678/eshel", echo=True
 )
-with Session(engine) as session:
-    session.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+print("Adding Vector extension")
+# with Session(engine) as session:
+#     session.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
 Base = declarative_base()
 
+print("Initating DB Classes")
 
 association_table = Table(
     "association_table",
@@ -22,7 +25,6 @@ association_table = Table(
 )
 
 ### Next classes are user info in the database
-
 
 class Teacher(Base):
     __tablename__ = "teachers"
@@ -61,7 +63,7 @@ class Student(Base):
         secondary=association_table, back_populates="students"
     )
     name: Mapped[str] = mapped_column()
-    face_embedding = mapped_column(Vector(384), nullable=True)
+    face_embedding = mapped_column(Vector(512), nullable=True)
 
 
 class AttendanceEvent(Base):
@@ -82,5 +84,6 @@ class Timer(Base):
     timing: Mapped[int] = mapped_column()
     teacher_id: Mapped[int] = mapped_column(ForeignKey("teachers.id"))
 
-
+print("Creating DB")
 Base.metadata.create_all(engine)
+print("Done with DB")
