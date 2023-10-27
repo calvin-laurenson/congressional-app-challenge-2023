@@ -72,7 +72,7 @@ async def add_timer(timing: int, teacher_id: int):
 
 # Post for image transfer from camera
 @app.post("/add_image")
-async def add_image(image_file: Annotated[bytes, File()], time: str, tardy: bool):
+async def add_image(image_file: Annotated[bytes, File()], time: int, tardy: bool):
     image = Image.open(BytesIO(image_file))
     faces = model.find_faces(image)
     with Session(engine) as session:
@@ -91,7 +91,7 @@ async def add_image(image_file: Annotated[bytes, File()], time: str, tardy: bool
 
 
 @app.post("/add_attendance")
-async def add_attendance(student_id: int, time: str, tardy: bool):
+async def add_attendance(student_id: int, time: int, tardy: bool):
     with Session(engine) as session:
         student_query = session.query(Student).filter(Student.id == student_id)
         if len(student_query.all()) != 1:
@@ -233,7 +233,7 @@ async def get_student_attendance(student_id: int):
 
 
 @app.get("/get_class_attendance")
-async def get_class_attendance(class_id: int, start_time: str):
+async def get_class_attendance(class_id: int, start_time: int):
     with Session(engine) as session:
         class_query = session.query(PeriodClass)
         periodclass = class_query.filter(PeriodClass.id == class_id).all()
@@ -288,12 +288,14 @@ async def get_class_name_by_id(class_name: str):
             return {"error": f"didn't find one {class_name=}"}
         return {"error": None, "id": periodclasses[0].name}
 
+
 @app.get("/get_class_names_by_teacher_id")
 async def get_class_names_by_teacher_id(teacher_id: int):
     with Session(engine) as session:
         class_query = session.query(PeriodClass)
         periodclasses = class_query.filter(PeriodClass.teacher_id == teacher_id).all()
         return {"error": None, "periodclasses": [c.name for c in periodclasses]}
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000)

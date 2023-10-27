@@ -73,7 +73,7 @@ class AttendanceEvent(Base):
 
     student_id: Mapped[int] = mapped_column(ForeignKey("students.id"))
     student: Mapped["Student"] = relationship()
-    time: Mapped[str] = mapped_column()  # TODO: Make datetime
+    time: Mapped[int] = mapped_column()
     inputType: Mapped[str] = mapped_column()
     tardy: Mapped[bool] = mapped_column()
 
