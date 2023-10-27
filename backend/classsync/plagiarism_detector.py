@@ -3,7 +3,7 @@ import numpy as np
 from numpy.linalg import norm
 from numpy.typing import NDArray
 
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+model = SentenceTransformer("jinaai/jina-embeddings-v2-base-en")
 
 
 def cosine_similarity(A: NDArray, B: NDArray):

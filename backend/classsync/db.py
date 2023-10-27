@@ -8,7 +8,7 @@ from pgvector.sqlalchemy import Vector
 
 print("Initiating DB Engine")
 engine = create_engine(
-    "postgresql+psycopg2://postgres:esheldror1234@209.141.60.99:1678/eshel", echo=True
+    "postgresql+psycopg2://postgres:esheldror1234@public:1678/eshel", echo=True
 )
 print("Adding Vector extension")
 # with Session(engine) as session:
@@ -25,6 +25,7 @@ association_table = Table(
 )
 
 ### Next classes are user info in the database
+
 
 class Teacher(Base):
     __tablename__ = "teachers"
@@ -84,6 +85,7 @@ class Timer(Base):
 
     timing: Mapped[int] = mapped_column()
     teacher_id: Mapped[int] = mapped_column(ForeignKey("teachers.id"))
+
 
 print("Creating DB")
 Base.metadata.create_all(engine)
