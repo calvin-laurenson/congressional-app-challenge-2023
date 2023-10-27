@@ -216,8 +216,8 @@ async def get_students_in_class(class_id: int):
             return {"error": f"periodclass not found for {class_id=}"}
         print("debug: returning students")
         students = periodclass_query.all()[0].students
-        student_ids = [s.name for s in students]
-        return student_ids
+        student_names = [s.name for s in students]
+        return student_names
 
 
 @app.get("/get_student_attendance")
@@ -279,15 +279,21 @@ async def get_student_name_by_id(student_id: int):
         return {"error": None, "id": student[0].name}
 
 
-@app.get("/get_class_name_by_id")
-async def get_class_name_by_id(class_id: str):
+@app.get("/get_class_id_by_name")
+async def get_class_name_by_id(class_name: str):
     with Session(engine) as session:
         class_query = session.query(PeriodClass)
-        periodclasses = class_query.filter(PeriodClass.id == class_id).all()
+        periodclasses = class_query.filter(PeriodClass.name == class_name).all()
         if len(periodclasses) != 1:
-            return {"error": f"didn't find one {class_id=}"}
+            return {"error": f"didn't find one {class_name=}"}
         return {"error": None, "id": periodclasses[0].name}
 
+@app.get("/get_class_names_by_teacher_id")
+async def get_class_names_by_teacher_id(teacher_id: int):
+    with Session(engine) as session:
+        class_query = session.query(PeriodClass)
+        periodclasses = class_query.filter(PeriodClass.teacher_id == teacher_id).all()
+        return {"error": None, "periodclasses": [c.name for c in periodclasses]}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000)
