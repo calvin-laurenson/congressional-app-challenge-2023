@@ -5,8 +5,9 @@ from PIL import Image
 
 class Models:
     def __init__(self):
-        self.detector = scrfd.SCRFD(model_file="./scrfd-10g-kps.onnx")
-        self.pfc = partial_fc.PartialFC("pfc.onnx")
+        print("Initiating facial recognition models")
+        self.detector = scrfd.SCRFD(model_file="./backend/scrfd-10g-kps.onnx")
+        self.pfc = partial_fc.PartialFC("./backend/pfc.onnx")
 
     def find_faces(self, image: Image.Image):
         faces = self.detector.detect(image, 0.6, (640, 640))

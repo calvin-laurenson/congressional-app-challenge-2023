@@ -74,6 +74,7 @@ class AttendanceEvent(Base):
     student: Mapped["Student"] = relationship()
     time: Mapped[str] = mapped_column()  # TODO: Make datetime
     inputType: Mapped[str] = mapped_column()
+    tardy: Mapped[bool] = mapped_column()
 
 
 class Timer(Base):
