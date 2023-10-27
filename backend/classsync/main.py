@@ -10,18 +10,28 @@ from classsync.db import (
     PeriodClass,
     association_table,
 )
-from classsync.plagiarism_detector import model, cosine_similarity
+from classsync.plagiarism_detector import model as sbert, cosine_similarity
 from classsync.models import Models
 from sqlalchemy.orm import Session
 import uvicorn
 from typing import Annotated
 from PIL import Image
 from io import BytesIO
+from fastapi.middleware.cors import CORSMiddleware
+
 
 print("Initiating API")
 app = FastAPI()
 print("Initiating Models")
 model = Models()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Posts
@@ -71,11 +81,16 @@ async def add_image(image_file: Annotated[bytes, File()], time: str):
     faces = model.find_faces(image)
     with Session(engine) as session:
         for face in faces:
-            student = session.query(Student).order_by(Student.face_embedding.cosine_distance(face)).first()
+            student = (
+                session.query(Student)
+                .order_by(Student.face_embedding.cosine_distance(face))
+                .first()
+            )
             entry = AttendanceEvent(student=student, time=time, inputType="image")
             session.add(entry)
         session.commit()
         return {"error": None, "face count": len(faces)}
+
 
 @app.post("/add_attendance")
 async def add_attendance(student_id, time):
@@ -84,12 +99,14 @@ async def add_attendance(student_id, time):
         if len(student_query.all()) != 1:
             return {"error": f"student not found for {student_id=}"}
         student = student_query[0]
-        entry = AttendanceEvent(student=student, time=time, inputType = "manual")
+        entry = AttendanceEvent(student=student, time=time, inputType="manual")
         session.add(entry)
         session.commit()
         return {"error": None}
 
+
 # Patches
+
 
 @app.patch("/add_student_to_class")
 async def add_student_to_class(student_id: int, class_id: int):
@@ -105,6 +122,7 @@ async def add_student_to_class(student_id: int, class_id: int):
         )
         session.commit()
         return {"error": None}
+
 
 @app.patch("/add_face_to_student")
 async def add_student_to_class(face_img: Annotated[bytes, File()], student_id: int):
@@ -125,18 +143,21 @@ async def add_student_to_class(face_img: Annotated[bytes, File()], student_id: i
         session.refresh(student)
         return {"error": None}
 
+
 # Get section for students, plagiarism, timers
 
 
 @app.get("/get_plagiarized")
 async def get_plagiarized(writing1: str, writing2: str):
-    return float(cosine_similarity(model.encode(writing1), model.encode(writing2)))
+    return {"error": None, "similarity": float(cosine_similarity(sbert.encode(writing1), sbert.encode(writing2)))}
+
 
 @app.get("/get_attendance")
 async def get_attendance():
     with Session(engine) as session:
         attendance_query = session.query(AttendanceEvent)
         return attendance_query.all()
+
 
 @app.get("/get_classes")
 async def get_periodclasses():
@@ -179,16 +200,17 @@ async def get_students_in_class(class_id: int):
         student_ids = [s.id for s in students]
         return student_ids
 
-        
-
 
 @app.get("/get_student_attendance")
 async def get_student_attendance(student_id: int):
     with Session(engine) as session:
         attendance_query = session.query(AttendanceEvent)
-        attendance_events = attendance_query.filter(AttendanceEvent.student_id==student_id).order_by(AttendanceEvent.time).all()
+        attendance_events = (
+            attendance_query.filter(AttendanceEvent.student_id == student_id)
+            .order_by(AttendanceEvent.time)
+            .all()
+        )
         return attendance_events
-
 
 
 if __name__ == "__main__":
