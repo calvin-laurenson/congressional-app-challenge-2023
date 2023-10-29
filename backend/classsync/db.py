@@ -2,7 +2,7 @@ from typing import List, Optional
 from sqlalchemy import create_engine, ForeignKey, Table, Column, Integer
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship
 from sqlalchemy.orm import Session
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, BIGINT
 from sqlalchemy.sql import text
 from pgvector.sqlalchemy import Vector
 
@@ -73,7 +73,7 @@ class AttendanceEvent(Base):
 
     student_id: Mapped[int] = mapped_column(ForeignKey("students.id"))
     student: Mapped["Student"] = relationship()
-    time: Mapped[int] = mapped_column()
+    time: Mapped[int] = mapped_column(BIGINT)
     inputType: Mapped[str] = mapped_column()
     tardy: Mapped[bool] = mapped_column()
 

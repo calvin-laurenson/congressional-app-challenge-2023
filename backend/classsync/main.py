@@ -87,7 +87,7 @@ async def add_image(image_file: Annotated[bytes, File()], time: int, tardy: bool
             )
             session.add(entry)
         session.commit()
-        return {"error": None, "face count": len(faces)}
+        return {"error": None, "face_count": len(faces)}
 
 
 @app.post("/add_attendance")
