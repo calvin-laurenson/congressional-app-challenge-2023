@@ -24,21 +24,7 @@ function App() {
       children: [
         {
           path: "dashboard",
-          element: <Dashboard />,
-          children: [
-            {
-              path: "camera",
-              element: <Camera />
-            },
-            {
-              path: "attendance",
-              element: <Attendance />
-            },
-            {
-              path: "teams",
-              element: <Teams />
-            }
-          ]
+          element: <Dashboard />
         },
         {
           path: "/plagiarism",

@@ -1,4 +1,5 @@
-from fastapi import FastAPI, File
+import time
+from fastapi import FastAPI, File, Request
 from classsync.db import (
     Student,
     Timer,
@@ -29,6 +30,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
 # Posts
 @app.post("/add_teacher")
@@ -79,15 +87,18 @@ async def add_image(image_file: Annotated[bytes, File()], time: int, tardy: bool
         for face in faces:
             student = (
                 session.query(Student)
-                .order_by(Student.face_embedding.cosine_distance(face))
+                .order_by(Student.face_embedding.cosine_distance(face).desc())
+                .filter(Student.face_embedding.cosine_distance(face) > 0.98)
                 .first()
             )
+            if student is None:
+                continue
             entry = AttendanceEvent(
                 student=student, time=time, inputType="image", tardy=tardy
             )
             session.add(entry)
         session.commit()
-        return {"error": None, "face count": len(faces)}
+        return {"error": None, "face_count": len(faces)}
 
 
 @app.post("/add_attendance")
