@@ -17,6 +17,7 @@ from typing import Annotated
 from PIL import Image
 from io import BytesIO
 from fastapi.middleware.cors import CORSMiddleware
+import numpy as np
 
 
 app = FastAPI()
@@ -91,9 +92,11 @@ async def add_image(image_file: Annotated[bytes, File()], time: int, tardy: bool
                 .order_by(Student.face_embedding.cosine_distance(face).desc())
                 .all()
             )
-            if (students is None) or (1 - students[0].cosine_distance(face))*2 > (1 - students[1].cosine_distance(face)):
-                not_found += 1
-                continue
+            if len(students) >= 3:
+                similarities = [cosine_similarity(students[i].face_embedding,np.asarray(face)) for i in range(3)]
+                if (students is None) or (similarities[0]-similarities[1]) > 1.5*(similarities[1]-similarities[2]):
+                    not_found += 1
+                    continue
             entry = AttendanceEvent(
                 student=students[0], time=time, inputType="image", tardy=tardy
             )
