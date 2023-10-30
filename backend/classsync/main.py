@@ -294,22 +294,12 @@ async def get_student_name_by_id(student_id: int):
         return {"error": None, "id": student[0].name}
 
 
-@app.get("/get_class_id_by_name")
-async def get_class_name_by_id(class_name: str):
-    with Session(engine) as session:
-        class_query = session.query(PeriodClass)
-        periodclasses = class_query.filter(PeriodClass.name == class_name).all()
-        if len(periodclasses) != 1:
-            return {"error": f"didn't find one {class_name=}"}
-        return {"error": None, "id": periodclasses[0].name}
-
-
-@app.get("/get_class_names_by_teacher_id")
-async def get_class_names_by_teacher_id(teacher_id: int):
+@app.get("/get_classes_by_teacher_id")
+async def get_classes_by_teacher_id(teacher_id: int):
     with Session(engine) as session:
         class_query = session.query(PeriodClass)
         periodclasses = class_query.filter(PeriodClass.teacher_id == teacher_id).all()
-        return {"error": None, "periodclasses": [c.name for c in periodclasses]}
+        return {"error": None, "periodclasses": [{"name":c.name, "id": c.id} for c in periodclasses]}
 
 
 if __name__ == "__main__":
