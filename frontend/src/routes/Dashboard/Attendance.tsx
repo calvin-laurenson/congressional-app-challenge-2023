@@ -27,7 +27,7 @@ export default function Attendance({ attendance }: { attendance: ClassAttendance
             </div>
         <div className="grid grid-cols-2 gap-4">
             {Object.keys(attendance).map(k => (
-                <Card>
+                <Card key={k}>
                     <div className="flex flex-row items-center justify-between">
 
                         <div className="rounded-full w-5 h-5" style={{ backgroundColor: COLORS[attendance[k]] }}>

@@ -87,9 +87,12 @@ async def add_image(image_file: Annotated[bytes, File()], time: int, tardy: bool
         for face in faces:
             student = (
                 session.query(Student)
-                .order_by(Student.face_embedding.cosine_distance(face))
+                .order_by(Student.face_embedding.cosine_distance(face).desc())
+                .filter(Student.face_embedding.cosine_distance(face) > 0.98)
                 .first()
             )
+            if student is None:
+                continue
             entry = AttendanceEvent(
                 student=student, time=time, inputType="image", tardy=tardy
             )

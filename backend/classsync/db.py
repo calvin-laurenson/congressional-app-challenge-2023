@@ -8,7 +8,7 @@ from pgvector.sqlalchemy import Vector
 
 print("Initiating DB Engine")
 engine = create_engine(
-    "postgresql+psycopg2://postgres:esheldror1234@public:1678/eshel", echo=True
+    "postgresql+psycopg2://admin:12345678@localhost:5433/eshel", echo=True
 )
 print("Adding Vector extension")
 # with Session(engine) as session:
