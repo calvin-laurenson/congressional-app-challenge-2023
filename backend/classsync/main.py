@@ -83,22 +83,23 @@ async def add_timer(timing: int, teacher_id: int):
 async def add_image(image_file: Annotated[bytes, File()], time: int, tardy: bool):
     image = Image.open(BytesIO(image_file))
     faces = model.find_faces(image)
+    not_found = 0
     with Session(engine) as session:
         for face in faces:
-            student = (
+            students = (
                 session.query(Student)
                 .order_by(Student.face_embedding.cosine_distance(face).desc())
-                .filter(Student.face_embedding.cosine_distance(face) > 0.98)
-                .first()
+                .all()
             )
-            if student is None:
+            if (students is None) or (1 - students[0].cosine_distance(face))*2 > (1 - students[1].cosine_distance(face)):
+                not_found += 1
                 continue
             entry = AttendanceEvent(
-                student=student, time=time, inputType="image", tardy=tardy
+                student=students[0], time=time, inputType="image", tardy=tardy
             )
             session.add(entry)
         session.commit()
-        return {"error": None, "face_count": len(faces)}
+        return {"error": None, "face_count": len(faces), "not_found": not_found}
 
 
 @app.post("/add_attendance")
