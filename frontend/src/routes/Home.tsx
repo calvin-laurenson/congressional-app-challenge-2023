@@ -11,8 +11,8 @@ export default function Home() {
                 {/* <img src="ClassSyncText.svg" alt="ClassSync" className="h-[inherit] mt-2 mb-1" style={{ filter: "invert(1)" }} /> */}
                 <div className="grow-[4]"></div>
                 <NavLink to="/dashboard" children={({ isActive }) => <Button variant={isActive ? "solid" : "soft"} >Dashboard</Button>} />
-                <NavLink to="/plagiarism" children={({ isActive }) => <Button variant={isActive ? "solid" : "soft"} >Plagiarism</Button>} />
-                <NavLink to="/timers" children={({ isActive }) => <Button variant={isActive ? "solid" : "soft"} className="mr-4">Timers</Button>} />
+                <NavLink to="/plagiarism" children={({ isActive }) => <Button variant={isActive ? "solid" : "soft"} className="mr-4" >Plagiarism</Button>} />
+                {/* <NavLink to="/timers" children={({ isActive }) => <Button variant={isActive ? "solid" : "soft"} className="mr-4">Timers</Button>} /> */}
 
             </div>
 
