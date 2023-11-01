@@ -10,7 +10,7 @@ class Models:
         self.pfc = partial_fc.PartialFC("./backend/pfc.onnx")
 
     def find_faces(self, image: Image.Image):
-        faces = self.detector.detect(image, 0.6, (640, 640))
+        faces = self.detector.detect(image, 0.6)
         face_images = image_utils.extract_face_images(image, faces)
         recognized_faces: list[list] = [
             self.pfc.recognize(face_image).tolist() for face_image in face_images

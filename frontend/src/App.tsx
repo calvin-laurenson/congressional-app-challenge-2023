@@ -5,7 +5,7 @@ import { Theme } from '@radix-ui/themes'
 import "@radix-ui/themes/styles.css";
 import Home from './routes/Home';
 import Dashboard from './routes/Dashboard/Dashboard';
-import Camera from './routes/Dashboard/Camera';
+// import Camera from './routes/Dashboard/Camera';
 import Attendance from './routes/Dashboard/Attendance';
 import Teams from './routes/Dashboard/Teams';
 import {
