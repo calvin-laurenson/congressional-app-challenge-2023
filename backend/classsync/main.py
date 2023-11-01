@@ -31,6 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     start_time = time.time()
@@ -38,6 +39,7 @@ async def add_process_time_header(request: Request, call_next):
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
     return response
+
 
 # Posts
 @app.post("/add_teacher")
@@ -92,10 +94,20 @@ async def add_image(image_file: Annotated[bytes, File()], time: int, tardy: bool
                 .order_by(Student.face_embedding.cosine_distance(face).desc())
                 .all()
             )
-            students = [student for student in students if student.face_embedding is not None]
+            students = [
+                student for student in students if student.face_embedding is not None
+            ]
             for student in students:
-                print(student.name, ": ", cosine_similarity(student.face_embedding, np.array(face)), "\n\n")
-            students = [(student, cosine_similarity(student.face_embedding, np.array(face))) for student in students]
+                print(
+                    student.name,
+                    ": ",
+                    cosine_similarity(student.face_embedding, np.array(face)),
+                    "\n\n",
+                )
+            students = [
+                (student, cosine_similarity(student.face_embedding, np.array(face)))
+                for student in students
+            ]
             students = [student for student in students if student[1] > 0.25]
             if len(students) == 0:
                 continue
@@ -304,7 +316,10 @@ async def get_classes_by_teacher_id(teacher_id: int):
     with Session(engine) as session:
         class_query = session.query(PeriodClass)
         periodclasses = class_query.filter(PeriodClass.teacher_id == teacher_id).all()
-        return {"error": None, "periodclasses": [{"name":c.name, "id": c.id} for c in periodclasses]}
+        return {
+            "error": None,
+            "periodclasses": [{"name": c.name, "id": c.id} for c in periodclasses],
+        }
 
 
 if __name__ == "__main__":
