@@ -96,7 +96,7 @@ async def add_image(image_file: Annotated[bytes, File()], time: int, tardy: bool
             for student in students:
                 print(student.name, ": ", cosine_similarity(student.face_embedding, np.array(face)), "\n\n")
             students = [(student, cosine_similarity(student.face_embedding, np.array(face))) for student in students]
-            students = [student for student in students if student[1] > 0.3]
+            students = [student for student in students if student[1] > 0.25]
             if len(students) == 0:
                 continue
             if len(students) >= 2:
